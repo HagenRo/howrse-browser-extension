@@ -1,29 +1,53 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <link rel="stylesheet" type="text/css" href="dataVisualization.css">
 </head>
+
 <body>
-    <input type="text" id="filterInput" placeholder="'1'!nl&'2'false">
-    <table  id="myTable">
+    <!-- <div> -->
+        <select id="seasons" name="seasons" data-placeholder="Select seasons" multiple data-multi-select>
+            <option value="Apple">Apple</option>
+            <option value="Banana">Banana</option>
+            <option value="Blackberry">Blackberry</option>
+            <option value="Blueberry">Blueberry</option>
+            <option value="Cherry">Cherry</option>
+            <option value="Cranberry">Cranberry</option>
+            <option value="Grapes">Grapes</option>
+            <option value="Kiwi">Kiwi</option>
+            <option value="Mango">Mango</option>
+            <option value="Orange">Orange</option>
+            <option value="Peach">Peach</option>
+            <option value="Pear">Pear</option>
+            <option value="Pineapple">Pineapple</option>
+            <option value="Raspberry">Raspberry</option>
+            <option value="Strawberry">Strawberry</option>
+            <option value="Watermelon">Watermelon</option>
+        </select>
+        <input type="text" id="filterInput" placeholder="'1'!nl&'2'false">
+
+    <!-- </div> -->
+    <table id="myTable">
         <thead>
             <tr>
-                <th >Startzeit</th>
-                <th >Domain</th>
-                <th >Drachme</th>
-                <th >Startpferde</th>
-                <th >Gewinnwahrscheinlichkeit</th>
-                <th >Boss geschafft</th>
-                <th >Letzter Raum</th>
-                <th >Fragmente</th>
+                <th>Startzeit</th>
+                <th>Domain</th>
+                <th>Drachme</th>
+                <th>Startpferde</th>
+                <th>Gewinnwahrscheinlichkeit</th>
+                <th>Boss geschafft</th>
+                <th>Letzter Raum</th>
+                <th>Fragmente</th>
             </tr>
         </thead>
         <tbody id="myTableBody">
 
         </tbody>
     </table>
+    <script src="MultiSelect.js"></script>
     <script src="../jquery.js"></script>
     <script src="dataVisualization.js"></script>
 </body>
-</html>
 
+</html>

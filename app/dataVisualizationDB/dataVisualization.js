@@ -1,150 +1,7 @@
-//TODO: schauen was man gegen doppelte einträge machen kann, vermutlich durch prellen der maus verursacht werden. in logging oder datamanagement...
-
-//importScripts('../jquery.js');
-// function filterTable() {
-
-
-//     let txtValue;
-//     let input = document.getElementById("filterInput");
-//     let filter = input.value.toUpperCase()
-//     let last = input.value.toUpperCase().slice(-1);
-//     if ((filter.split("'").length - 1) % 2 == 1 || last == '&' || last == "'" || last == '!' || last == '>' || last == '<') {
-//         let lastOccurrence = filter.lastIndexOf('&') == -1 ? 0 : filter.lastIndexOf('&');
-//         filter = filter.slice(0, lastOccurrence);
-//     }
-//     let filterList = filter.split('&');
-//     let table = document.getElementById("myTable");
-//     let tr = table.getElementsByClassName("js-filter");
-
-
-
-
-
-//     //reset table
-//     for (let i = 0; i < tr.length; i++) {
-//         tr[i].style.display = "";
-//     }
-
-//     console.log('---------------------')
-//     goThroughRowsPos:
-//     for (let i = 0; i < tr.length; i++) {
-//         let matchFoundI = [];
-//         let array_td = tr[i].getElementsByTagName("td");
-//         goThroughFilterPos:
-//         for (let filterIndex = 0; filterIndex < filterList.length; filterIndex++) {
-//             const filterI = filterList[filterIndex];
-//             matchFoundI[filterIndex] = false;
-//             [_, headline, filterHeadline] = filterI.split("'");
-
-//             if (filterI.slice(0, 1) == '!' || filterHeadline?.slice(0, 1) == '!') {
-//                 matchFoundI[filterIndex] = true;
-//                 continue goThroughFilterPos;
-//             }
-//             //console.log(headline, filterHeadline);
-//             if (filterHeadline) {
-//                 //console.log(headline, filterHeadline);
-
-//                 const td = array_td[parseInt(headline)];
-//                 if (td) {
-//                     txtValue = td.textContent || td.innerText;
-//                     if (filterHeadline.slice(0, 1) == '>' && headline == 0) {
-//                         date = new Date(filterHeadline + ' GMT+0100 (Mitteleuropäische Normalzeit)');
-//                         matchFoundI[filterIndex] = date < new Date(txtValue);
-
-//                     } else if (filterHeadline.slice(0, 1) == '<' && headline == 0) {
-//                         date = new Date(filterHeadline + ' GMT+0100 (Mitteleuropäische Normalzeit)');
-//                         matchFoundI[filterIndex] = date > new Date(txtValue);
-
-//                     } else if (txtValue.toUpperCase().match(filterHeadline)) {
-//                         matchFoundI[filterIndex] = true;
-//                     }
-//                 }
-
-//             } else {
-//                 for (let index = 0; index < array_td.length; index++) {
-//                     const td = array_td[index];
-//                     if (td) {
-//                         txtValue = td.textContent || td.innerText;
-//                         if (txtValue.toUpperCase().match(filterI)) {
-//                             matchFoundI[filterIndex] = true;
-//                             break;
-//                         }
-//                     }
-//                 }
-//             }
-
-//         }
-//         let matchFound = matchFoundI.every(v => v === true);
-//         if (matchFound) {
-//             tr[i].style.display = "";
-//         } else {
-//             tr[i].style.display = "none";
-//         }
-
-//     }
-//     console.log('2---------------------')
-//     goThroughRowsNeg:
-//     for (let i = 0; i < tr.length; i++) {
-//         let matchFoundI = [];
-//         let array_td = tr[i].getElementsByTagName("td");
-//         goThroughFilterNeg:
-//         for (let filterIndex = 0; filterIndex < filterList.length; filterIndex++) {
-//             let filterI = filterList[filterIndex];
-//             matchFoundI[filterIndex] = false;
-//             [_, headline, filterHeadline] = filterI.split("'");
-
-//             if (!(filterI.slice(0, 1) == '!' || filterHeadline?.slice(0, 1) == '!')) {
-//                 matchFoundI[filterIndex] = false;
-//                 continue goThroughFilterNeg;
-//             }
-
-//             console.log(headline, filterHeadline);
-//             if (filterHeadline) {
-//                 //console.log(headline, filterHeadline);
-//                 filterHeadline = filterHeadline.slice(1);
-//                 const td = array_td[parseInt(headline)];
-//                 if (td) {
-//                     txtValue = td.textContent || td.innerText;
-//                     if (txtValue.toUpperCase().match(filterHeadline)) {
-//                         matchFoundI[filterIndex] = true;
-//                         break goThroughFilterNeg;
-//                     }
-//                 }
-
-//             } else {
-//                 filterI = filterI.slice(1);
-//                 for (let index = 0; index < array_td.length; index++) {
-//                     const td = array_td[index];
-//                     if (td) {
-//                         txtValue = td.textContent || td.innerText;
-//                         console.log(txtValue, filterI);
-//                         if (txtValue.toUpperCase().match(filterI)) {
-//                             console.log(txtValue, filterI);
-//                             matchFoundI[filterIndex] = true;
-//                             break goThroughFilterNeg;
-//                         }
-//                     }
-//                 }
-//             }
-
-
-//         }
-
-//         let matchFound = matchFoundI.some(v => v === true);
-//         if (matchFound) {
-//             tr[i].style.display = "none";
-//         } else {
-//             //tr[i].style.display = "none";
-//         }
-
-//     }
-//     calculateAverage();
-// }
-
-function filterUIRuns() {
-
+function filterUIRuns() {//TODO funktioniert nicht
+console.log('hi');
     let uIRunFilters = [{//jeder Filter kann genau einen Filter einer art enthalten
-        "columnIndex": 0,//-1 um alle spalten zu durchsuchen
+        "columnIndex": 0,//null um alle spalten zu durchsuchen
         "filterType": "",//"","!","<",">"
         "filterText": "",
     }]
@@ -154,40 +11,33 @@ function filterUIRuns() {
 
     let filterList = input.split('&');
     filterList.forEach(filter => {
-        try {//versuche spaltenbasierte filter auszulesen
-            let uIRunFilter = {};
-            let result = /'[^']*'(:?[!<>]?)(.+)/g.exec(filter)[1];//TODO
-            uIRunFilter.columnIndex = /'([^']*)'.+/g.exec(filter)[1];
-            uIRunFilter.filterType = /'[^']*'([!<>]?).*/g.exec(filter)[1];
-            uIRunFilter.filterText = /'[^']*'(:?[!<>]?)(.+)/g.exec(filter)[1];//TODO
-            if (/('|!|<|>)/.test(uIRunFilter.filterText)) {
-                throw new Error();
+        let uIRunFilter = {};
+        if (uIRunFilter.columnIndex = /^'(\d+)'([!<>]?)([^!<>].*)$/g.test(filter)) {
+            let result = /^'(\d+)'([!<>]?)([^!<>].*)$/g.exec(filter);
+            uIRunFilter.columnIndex = result[1];
+            uIRunFilter.filterType = result[2];
+            uIRunFilter.filterText = result[3];
 
-            }
-            if ((uIRunFilter.filterType == '<' || uIRunFilter.filterType == '>') && uIRunFilter.filterText != "") {
+            console.log(result);
+
+            if (uIRunFilter.filterType == '<' || uIRunFilter.filterType == '>') {
                 try {
                     uIRunFilter.filterText = new Date(uIRunFilter.filterText + ' GMT+0100 (Mitteleuropäische Normalzeit)');
-                    if (condition) {
-                        
-                    }
 
                 } catch (error) {//falls bei der nutzung kein korektes datum eingegeben wurde filter abbrechen
                     return;
                 }
             }
             uIRunFilters.push(uIRunFilter);
-        } catch (error) {
-            try {//versuche zeilenbasierten filter zu lesen
-                let uIRunFilter = {};
-                uIRunFilter.filterType = /([!<>]?).+/g.exec(filter)[1];
-                uIRunFilter.filterText = /[!<>]?(.+)/g.exec(filter)[1];
-                if (/('|!|<|>)/.test(uIRunFilter.filterText)) {
-                    throw new Error();
-                }
-                uIRunFilters.push(uIRunFilter);
-            } catch (error) {//wenn der eingabestring das regex tötet ist es keine vollständige oder gültige eingabe
-                return;
-            }
+
+        } else if (uIRunFilter.columnIndex = /^(!?)([^!'].*)$/g.test(filter)) {
+            let result = /^(!?)([^!].*)/g.exec(filter);
+            uIRunFilter.columnIndex = null;
+            uIRunFilter.filterType = result[1];
+            uIRunFilter.filterText = result[2];
+
+            console.log(result);
+            uIRunFilters.push(uIRunFilter);
 
         }
 
@@ -233,58 +83,7 @@ function filterUIRuns() {
 
             }
 
-            // if (filter.columnIndex == -1) {//filter wird auf ganze zeile angewendet
-            //     posFiltersTrue = uIRun.some((column) => {
-            //         return column.innerHTML.toUpperCase().match(filter.positiveFilter);
-            //     });//wenn in einer zeile mindestens ein match gefunden wurde ist posFiltersTrue true
-
-            //     negMatchFound = negMatchFound || uIRun.some((column) => {
-            //         return column.innerHTML.toUpperCase().match(filter.negativeFilter);
-            //     });//wenn in einer zeile mindestens ein match gefunden wurde ist negMatchFound true
-
-            //     return posFiltersTrue && !negMatchFound;//sobald ein negativer filter gefunden wurde kann abgebrochen werden//sobald ein positiver filter nicht erfüllt ist kann abgebrochen werden
-
-            // } else {//filter mit spaltenabhängigkeit
-            //     const cellText = uIRun[filter.columnIndex].innerHTML;
-
-            //     posFiltersTrue = cellText.toUpperCase().match(filter.positiveFilter);//wenn für alle filter aller zellen mindestens ein match gefunden wurde ist posFiltersTrue true
-
-            //     negMatchFound = cellText.toUpperCase().match(negativeFilter);//wenn für alle filter aller zellen mindestens ein match gefunden wurde ist negMatchFound true
-
-            //     if (filter.columnIndex == 0) {//wenn die datumsspalte gefiltert wird kann auch größer kleiner verwendet werden
-            //         posFiltersTrue = posFiltersTrue && uIRun.sortCriteria > greaterFilter;
-
-            //         posFiltersTrue = posFiltersTrue && uIRun.sortCriteria < lesserFilter;
-
-            //     }
-
-            //     return posFiltersTrue && !negMatchFound;//sobald ein negativer filter gefunden wurde kann abgebrochen werden//sobald ein positiver filter nicht erfüllt ist kann abgebrochen werden
-
-            // }
-
         });
-
-
-        // for (let column = 0; column < filters.length; column++) {
-        //     const cellText = uIRun[column].innerHTML;
-        //     posFiltersTrue = posFiltersTrue && filters[column].positiveFilters.every(positiveFilter => {
-        //         return cellText.toUpperCase().match(positiveFilter);
-        //     });//wenn für alle filter aller zellen mindestens ein match gefunden wurde ist allFiltersTrue
-
-        //     if (!posFiltersTrue) {//sobald ein positiver filter nicht erfüllt ist kann abgebrochen werden
-        //         break;
-        //     }
-
-        //     negMatchFound = negMatchFound || filters[column].negativeFilters.some(negativeFilter => {
-        //         return cellText.toUpperCase().match(negativeFilter);
-        //     });//wenn für alle filter aller zellen mindestens ein match gefunden wurde ist allFiltersTrue!
-
-        //     if (negMatchFound) {//sobald ein negativer filter gefunden wurde kann abgebrochen werden
-        //         break;
-        //     }
-        // }
-
-        // return posFiltersTrue && !negMatchFound;
     })
     buildTableForUIRuns(filteredUIRuns);
 }
@@ -385,111 +184,6 @@ function calculateAverage() {
 
 document.getElementById("filterInput").addEventListener("input", filterUIRuns);
 
-//let dir = "asc";//global??
-// function sortTable(n) {
-//     console.log('sorting');
-//     let table, rows, switching, i, x, y, shouldSwitch, switchcount = 0;
-//     table = document.getElementById("myTable");
-
-//     let headlines = table.getElementsByTagName("th");
-//     for (let index = 0; index < headlines.length; index++) {
-//         const element = headlines[index];
-//         element.classList.remove("sorted");
-//     }
-//     headlines[n].classList.add('sorted');
-
-//     switching = true;
-
-//     let stupid = 0;
-//     while (switching) {
-
-//         switching = false;
-//         //rows = table.getElementsByTagName("tr");
-//         rows = table.querySelectorAll("tr:not([style*='display: none'])");
-//         console.log("rows.length: ", rows.length);
-
-//         for (i = 1; i < (rows.length - 1); i++) {
-//             stupid++;
-//             shouldSwitch = false;
-//             x = rows[i].getElementsByTagName("td")[n];
-//             y = rows[i + 1].getElementsByTagName("td")[n];
-
-//             switch (n) {
-//                 case 0:
-//                     //console.log(new Date(x.innerHTML) < new Date(y.innerHTML));
-//                     if (dir == "asc") {
-//                         if (new Date(x.innerHTML) < new Date(y.innerHTML)) {
-//                             shouldSwitch = true;
-//                         }
-//                     } else if (dir == "desc") {
-//                         if (new Date(x.innerHTML) > new Date(y.innerHTML)) {
-//                             shouldSwitch = true;
-//                         }
-//                     }
-//                     break;
-//                 case 4:
-//                     letWinProbX = x.id == '-' ? 0 : parseFloat(x.id);
-//                     letWinProbY = y.id == '-' ? 0 : parseFloat(y.id);
-
-//                     if (dir == "asc") {
-//                         if (letWinProbX > letWinProbY) {
-//                             shouldSwitch = true;
-//                         }
-//                     } else if (dir == "desc") {
-//                         if (letWinProbX < letWinProbY) {
-//                             shouldSwitch = true;
-//                         }
-//                     }
-//                     break;
-//                 case 7:
-//                     if (dir == "asc") {
-//                         if (parseFloat(x.id) > parseFloat(y.id)) {
-//                             shouldSwitch = true;
-//                         }
-//                     } else if (dir == "desc") {
-//                         if (parseFloat(x.id) < parseFloat(y.id)) {
-//                             shouldSwitch = true;
-//                         }
-//                     }
-//                     break;
-
-//                 default:
-//                     if (dir == "asc") {
-//                         if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-//                             shouldSwitch = true;
-//                         }
-//                     } else if (dir == "desc") {
-//                         if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-//                             shouldSwitch = true;
-//                         }
-//                     }
-//                     break;
-
-//             }
-//             if (shouldSwitch) {
-//                 rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-//                 switching = true;
-//                 switchcount++;
-//             }
-
-//         }
-//         //console.log(switching)
-//         //s.log(dir)
-
-//         if (!switching && dir == "asc") {
-//             dir = "desc";
-//             //console.log(dir)
-//         } else if (!switching && dir == "desc") {
-//             dir = "asc";
-//             //console.log(dir)
-//         }
-
-
-
-//     }
-//     console.log(stupid);
-//     console.log(switchcount);
-// }
 
 let g_collumToSort = 0;
 let asc = true;
@@ -543,76 +237,17 @@ function sortUIRunsDesc(a, b) {
     return sortUIRunsAsc(a, b) * -1;
 }
 
-// function sortUIRunsByDate(a, b) {
-//     return new Date(b[0].innerHTML) - new Date(a[0].innerHTML);
-// }
-// function sortUIRunsByDomaine(a, b) {
-//     if (a < b)
-//         return -1;
-//     if (a > b)
-//         return 1;
-//     return 0;
-// }
-// function sortUIRunsByDrachme(a, b) {
-//     if (a < b)
-//         return -1;
-//     if (a > b)
-//         return 1;
-//     return 0;
-// }
-// function sortUIRunsByStartHorses(a, b) {
-//     let cumulatedStartHorsesA = 0;
-//     let cumulatedStartHorsesB = 0;
-//     for (let index = 0; index < 4; index++) {
-
-//         cumulatedStartHorsesA += a[index]*index;
-//         cumulatedStartHorsesB += b[index]*index;
-
-//     }
-//     if (cumulatedStartHorsesA < cumulatedStartHorsesB)
-//         return -1;
-//     if (cumulatedStartHorsesA > cumulatedStartHorsesB)
-//         return 1;
-//     return 0;
-// }
-// function sortUIRunsByWinProb(a, b) {
-//     if (a < b)
-//         return -1;
-//     if (a > b)
-//         return 1;
-//     return 0;
-// }
-// function sortUIRunsByBossDone(a, b) {
-//     if (a < b)
-//         return -1;
-//     if (a > b)
-//         return 1;
-//     return 0;
-// }
-// function sortUIRunsByRoom(a, b) {
-//     if (a < b)
-//         return -1;
-//     if (a > b)
-//         return 1;
-//     return 0;
-// }
-// function sortUIRunsByFragments(a, b) {
-//     if (a < b)
-//         return -1;
-//     if (a > b)
-//         return 1;
-//     return 0;
-// }
-
-
 let globalArrayOfRuns = [];
 let g_UIRuns = [];
 loadRuns();
+//loadSeasons();
 
 $(document).on('mouseover', '.tooltip', function () {
+    console.log('hi');
     let anzahlFragmente = 0;
     let horse = $(this).attr('class').split(' ')[0];
     let elements = document.getElementsByClassName(horse);
+    console.log(horse, elements);
     for (let index = 0; index < elements.length; index++) {
         const element = elements[index];
         if (element.parentNode.parentNode.style.display != 'none') {
@@ -657,7 +292,7 @@ function buildArrayOfUIRuns(runs) {
         drachma.innerHTML = run.drachma;
         drachma.id = run.drachma ? 1 : 0;
         drachma.sortCriteria = run.drachma;
-        drachma.filterText = toString(drachma.innerHTML).toUpperCase();
+        drachma.filterText = run.drachma.toString().toUpperCase();
         uIRun.push(drachma);
 
         let startHorses = {}
@@ -797,5 +432,16 @@ function buildTableForUIRuns(uIRuns) {
 
     calculateAverage();
 
+}
+
+function exportRuns(){
+    chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({msg, result}) => {
+        if (msg === 'success') {
+            console.info(JSON.stringify(result));
+        }else{
+            console.log(msg);
+        }
+
+    });
 }
 

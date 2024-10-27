@@ -58,7 +58,8 @@ $(document).on('click', '#saveNew', function () {
 $(document).on('click', '#addRuns', function () {
     // Update the modified data and save it to the storage
     try {
-        const runs = JSON.parse(document.getElementById('myTextArea').value).arrayOfRuns;
+        const runs = JSON.parse(document.getElementById('myTextArea').value);
+        console.log(runs);
         if (runs?.[0]?.dateRunStarted) {
 
             addRuns(runs);
@@ -138,7 +139,7 @@ function addRuns(ArrayOfOlympRunLoggings) {
             console.log('getKeys:', msg, result);
 
             ArrayOfOlympRunLoggings.forEach(olympRun => {
-                if (!olympRun.dateRunStarted in result) {
+                if (!(olympRun.dateRunStarted in result)) {
                     chrome.runtime.sendMessage({ mdText: "addRunToDB", olympRun: olympRun }, ({ msg, result }) => {
                         console.log("addRunToDB:", msg, olympRun);
                     });
