@@ -1,5 +1,4 @@
 function filterUIRuns() {//TODO funktioniert nicht
-console.log('hi');
     let uIRunFilters = [{//jeder Filter kann genau einen Filter einer art enthalten
         "columnIndex": 0,//null um alle spalten zu durchsuchen
         "filterType": "",//"","!","<",">"
@@ -18,7 +17,6 @@ console.log('hi');
             uIRunFilter.filterType = result[2];
             uIRunFilter.filterText = result[3];
 
-            console.log(result);
 
             if (uIRunFilter.filterType == '<' || uIRunFilter.filterType == '>') {
                 try {
@@ -35,8 +33,6 @@ console.log('hi');
             uIRunFilter.columnIndex = null;
             uIRunFilter.filterType = result[1];
             uIRunFilter.filterText = result[2];
-
-            console.log(result);
             uIRunFilters.push(uIRunFilter);
 
         }
@@ -213,7 +209,6 @@ header.forEach(function (th, i) {
 function loadRuns() {
     chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({msg, result}) => {
         if (msg === 'success') {
-            console.log('loadedRuns: ', result);
             globalArrayOfRuns = result;
             g_UIRuns = buildArrayOfUIRuns(result);
             g_UIRuns.sort(sortUIRunsDesc);
@@ -243,11 +238,9 @@ loadRuns();
 //loadSeasons();
 
 $(document).on('mouseover', '.tooltip', function () {
-    console.log('hi');
     let anzahlFragmente = 0;
     let horse = $(this).attr('class').split(' ')[0];
     let elements = document.getElementsByClassName(horse);
-    console.log(horse, elements);
     for (let index = 0; index < elements.length; index++) {
         const element = elements[index];
         if (element.parentNode.parentNode.style.display != 'none') {

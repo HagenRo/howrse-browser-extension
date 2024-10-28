@@ -7,7 +7,6 @@
 class MultiSelectSeasonsFromDB {
 
     constructor(element, options = {}) {
-        //_getSeasonsFromDBAndFillAsOptions();
         let defaults = {
             placeholder: 'Select item(s)',
             max: null,
@@ -33,6 +32,9 @@ class MultiSelectSeasonsFromDB {
             }
         }
         this.name = this.selectElement.getAttribute('name') ? this.selectElement.getAttribute('name') : 'multi-select-' + Math.floor(Math.random() * 1000000);
+
+        this._getSeasonsFromDBAndFillAsOptionsData();
+
         if (!this.options.data.length) {
             let options = this.selectElement.querySelectorAll('option');
             for (let i = 0; i < options.length; i++) {
@@ -192,7 +194,7 @@ class MultiSelectSeasonsFromDB {
             this.element.querySelector('.multi-select-header-placeholder').remove();
         }
     }
-    _getSeasonsFromDBAndFillAsOptions() {//muss eventuell synchronisiert werden
+    _getSeasonsFromDBAndFillAsOptionsData() {//muss eventuell synchronisiert werden
         chrome.runtime.sendMessage({ mdText: "getAllSeasonsFromDB" }, ({ msg, result }) => {
             if (msg === 'success') {
                 console.log('loadedSeasons: ', result);
