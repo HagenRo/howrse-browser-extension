@@ -22,20 +22,26 @@ class DatabaseConnection {
     async init() {
         return new Promise((resolve, reject) => {
 
-            const request = indexedDB.open(this.dbName, 1);
+            console.log('indexedDB.open(this.dbName, 1);', this.dbName)
+
+            const request = indexedDB.open(this.dbName, 2);
 
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
                 if (!db.objectStoreNames.contains(this.storeName)) {
+                    console.log('this.storeName')
                     db.createObjectStore(this.storeName, { keyPath: this.keyPathd });
                 }
             };
 
             request.onerror = (event) => {
+                console.log('request.onerror')
                 reject('Datenbankfehler: ' + event.target.errorCode);
             };
 
             request.onsuccess = (event) => {
+                console.log('request.onsuccess')
+
                 this.db = event.target.result;
                 resolve(this.db);
             };
@@ -520,8 +526,9 @@ class DataAccessForSeasons {
      * Initializes the database connection and sets up the promise queue.
      */
     constructor() {
-        this.databaseConnection = new DatabaseConnection('Olymp', 'Seasons', 'seasonStartDate');
+        this.databaseConnection = new DatabaseConnection('OlympSeasons', 'Seasons', 'seasonStartDate');
         this.promisQueue = Queue;
+        console.log('DataAccessForSeasons: constructor')
         this.initDataAccessForSeasons();
     }
     /**

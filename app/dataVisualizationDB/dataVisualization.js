@@ -438,3 +438,19 @@ function exportRuns(){
     });
 }
 
+function addSeasonToDB(startDateOfSeason){
+    let date = new Date(startDateOfSeason);
+    let season = {
+        seasonStartDate: date.getTime(),
+        seasonStartDateHumanReadable: date.toString()
+    };
+    chrome.runtime.sendMessage({ mdText: "addSeasonToDB", season: season }, ({msg, result}) => {
+        if (msg === 'success') {
+            console.log(msg, result);
+        }else{
+            console.log(msg);
+        }
+
+    });
+}
+

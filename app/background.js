@@ -160,6 +160,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 sendResponse({msg: e});
             });
             break;
+        case "addSeasonToDB":
+            dataAccessForSeasons.addSeasonToDB(message.season)
+            .then(({msg, result})=>{
+                sendResponse({msg: msg, result: result});
+            })
+            .catch((e)=>{
+                sendResponse({msg: e});
+            });
+            break;
             
               
             
