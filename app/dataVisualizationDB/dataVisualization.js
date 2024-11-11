@@ -1,6 +1,6 @@
-function filterUIRuns() {//TODO funktioniert nicht
+function filterUIRuns() {
     let uIRunFilters = [{//jeder Filter kann genau einen Filter einer art enthalten
-        "columnIndex": 0,//null um alle spalten zu durchsuchen
+        "columnIndex": null,//null um alle spalten zu durchsuchen
         "filterType": "",//"","!","<",">"
         "filterText": "",
     }]
@@ -256,6 +256,11 @@ $(document).on('click', '.js-openRun', function () {
     let clickedBtnID = $(this.parentNode).attr('id');
     chrome.tabs.create({ url: `app/dataVisualizationDB/fight.html#${clickedBtnID}`, active: true });
 })
+$(document).on('click', '#loadRunsBySeasons', function () {
+    let selectetdSeasons = multiSelectSeasonsFromDB.selectedItems;
+    console.log(selectetdSeasons);
+})
+
 
 function buildArrayOfUIRuns(runs) {
     uIRuns = [];

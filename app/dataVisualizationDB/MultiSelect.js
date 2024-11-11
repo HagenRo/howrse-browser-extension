@@ -33,23 +33,30 @@ class MultiSelectSeasonsFromDB {
         }
         this.name = this.selectElement.getAttribute('name') ? this.selectElement.getAttribute('name') : 'multi-select-' + Math.floor(Math.random() * 1000000);
 
-        this._getSeasonsFromDBAndFillAsOptionsData();
-
-        if (!this.options.data.length) {
-            let options = this.selectElement.querySelectorAll('option');
-            for (let i = 0; i < options.length; i++) {
-                this.options.data.push({
-                    value: options[i].value,
-                    text: options[i].innerHTML,
-                    selected: options[i].selected,
-                    html: options[i].getAttribute('data-html')
-                });
+        this._getSeasonsFromDBAndFillAsOptionsData()
+        .then(() => {
+            console.log('Optionen wurden erfolgreich geladen und hinzugefügt.');
+            console.log(this.options.data)
+            if (!this.options.data.length) {
+                let options = this.selectElement.querySelectorAll('option');
+                for (let i = 0; i < options.length; i++) {
+                    this.options.data.push({
+                        value: options[i].value,
+                        text: options[i].innerHTML,
+                        selected: options[i].selected,
+                        html: options[i].getAttribute('data-html')
+                    });
+                }
             }
-        }
-        this.element = this._template();
-        this.selectElement.replaceWith(this.element);
-        this._updateSelected();
-        this._eventHandlers();
+            this.element = this._template();
+            this.selectElement.replaceWith(this.element);
+            this._updateSelected();
+            this._eventHandlers();        })
+        .catch(err => {
+            console.error('Fehler beim Laden der Optionen: ', err);
+        });        
+
+
     }
 
     _template() {
@@ -194,32 +201,30 @@ class MultiSelectSeasonsFromDB {
             this.element.querySelector('.multi-select-header-placeholder').remove();
         }
     }
-    _getSeasonsFromDBAndFillAsOptionsData() {//muss eventuell synchronisiert werden
-        chrome.runtime.sendMessage({ mdText: "getAllSeasonsFromDB" }, ({ msg, result }) => {
-            if (msg === 'success') {
-                console.log('loadedSeasons: ', result);
-                buildOptionsForSelect(result);
-            } else {
-                console.log(msg);
-            }
-
-        });
-        function buildOptionsForSelect(seasons) {
-            let select = document.getElementById("seasons")
-
-            seasons.forEach(season => {
-
-                // Create a new <option> element
-                const option = document.createElement('option');
-                option.textContent = "Option " + (select.length + 1); // Option text
-                option.value = "value" + (select.length + 1); // Option value
-
-                // Append the option to the select
-                select.appendChild(option);
+    _getSeasonsFromDBAndFillAsOptionsData() {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({ mdText: "getAllSeasonsFromDB" }, ({ msg, result }) => {
+                if (msg === 'success') {
+                    console.log('loadedSeasons: ', result);
+                    result.forEach(season => {
+                        this.options.data.push({
+                            value: season.seasonStartDate,
+                            text: season.seasonStartDateHumanReadable,
+                            selected: false,
+                            html: null
+                        });
+                    });
+                    resolve(); // Auflösung des Promises nach erfolgreichem Laden
+                } else {
+                    console.log(msg);
+                    reject(new Error(msg)); // Ablehnung des Promises bei Fehler
+                }
             });
-        }
+        });
 
+        
     }
+    
 
     get selectedValues() {
         return this.data.filter(data => data.selected).map(data => data.value);
@@ -286,4 +291,5 @@ class MultiSelectSeasonsFromDB {
     }
 
 }
-document.querySelectorAll('[data-multi-select]').forEach(select => new MultiSelectSeasonsFromDB(select));
+let multiSelectSeasonsFromDB = new MultiSelectSeasonsFromDB(document.querySelectorAll('[data-multi-select]')[0]);
+//document.querySelectorAll('[data-multi-select]')[1](select => new MultiSelectSeasonsFromDB(select));
