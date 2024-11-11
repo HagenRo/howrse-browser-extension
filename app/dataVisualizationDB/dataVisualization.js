@@ -207,14 +207,14 @@ header.forEach(function (th, i) {
     });
 });
 function loadRuns() {
-    chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({msg, result}) => {
+    chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
         if (msg === 'success') {
             globalArrayOfRuns = result;
             g_UIRuns = buildArrayOfUIRuns(result);
             g_UIRuns.sort(sortUIRunsDesc);
             buildTableForUIRuns(g_UIRuns);
             calculateAverage();
-        }else{
+        } else {
             console.log(msg);
         }
 
@@ -270,10 +270,11 @@ function buildArrayOfUIRuns(runs) {
 
         let uIRun = [];
         uIRun.isVisible = true;
+        uIRun.id = run.dateRunStarted;
 
         let startTime = {}
         startTime.innerHTML = run.dateRunStarted.substr(0, 24);
-        startTime.id = new Date(run.dateRunStarted);
+        //startTime.id = new Date(run.dateRunStarted);
         startTime.sortCriteria = new Date(run.dateRunStarted);
         startTime.filterText = startTime.innerHTML.toUpperCase();
         uIRun.push(startTime);
@@ -415,7 +416,7 @@ function buildTableForUIRuns(uIRuns) {
 
             let row = table.insertRow(-1);
             row.className = "js-filter";//TODO eventuell raus?
-            row.id = uIRun[0].id;
+            row.id = uIRun.id;
 
             for (let index = 0; index < uIRun.length; index++) {
 
@@ -432,30 +433,91 @@ function buildTableForUIRuns(uIRuns) {
 
 }
 
-function exportRuns(){
-    chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({msg, result}) => {
+function exportRuns() {
+    chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
         if (msg === 'success') {
             console.info(JSON.stringify(result));
-        }else{
+        } else {
             console.log(msg);
         }
 
     });
 }
 
-function addSeasonToDB(startDateOfSeason){
+function addSeasonToDB(startDateOfSeason) {
     let date = new Date(startDateOfSeason);
     let season = {
         seasonStartDate: date.getTime(),
         seasonStartDateHumanReadable: date.toString()
     };
-    chrome.runtime.sendMessage({ mdText: "addSeasonToDB", season: season }, ({msg, result}) => {
+    chrome.runtime.sendMessage({ mdText: "addSeasonToDB", season: season }, ({ msg, result }) => {
         if (msg === 'success') {
             console.log(msg, result);
-        }else{
+        } else {
             console.log(msg);
         }
 
+    });
+}
+
+
+
+//---------------------------------------------------------------------------------------
+// temp code for new version 
+
+function sortByDate(a, b) {
+    if (new Date(a.dateRunStarted) > new Date(b.dateRunStarted)) {
+        return -1;
+    } else if (new Date(a.dateRunStarted) < new Date(b.dateRunStarted)) {
+        return 1;
+    }
+    // a must be equal to b
+    return 0;
+}
+
+let arrayOfRunsOrgVersion;
+function compareVersions() {
+    chrome.storage.local.get(["arrayOfRuns"], function (keyValuePairs) {
+        console.log(keyValuePairs)
+        if (keyValuePairs.arrayOfRuns) {//if array exists
+            arrayOfRunsOrgVersion = keyValuePairs.arrayOfRuns;
+            console.log(arrayOfRunsOrgVersion);
+
+            arrayOfRunsOrgVersion.sort(sortByDate);
+            g_UIRuns.sort(sortUIRunsDesc);
+
+            let orgIndex = 0;
+            for (let index = 0; index < g_UIRuns.length; index++) {
+                let run = g_UIRuns[index];
+                let runOrg = arrayOfRunsOrgVersion[orgIndex];
+                while (new Date(run.id) < new Date(runOrg.dateRunStarted)) {
+                    orgIndex++;
+                    runOrg = arrayOfRunsOrgVersion[orgIndex];
+                }
+                if (run.id == runOrg.dateRunStarted) {
+                    if (run[1].innerHTML == runOrg.domain && (run[6].innerHTML == runOrg.arrayOfFights.length-1 || run[6].innerHTML == runOrg.arrayOfFights.length && run[5].innerHTML == 'Ja' || runOrg.arrayOfFights.length == 0 && run[6].innerHTML == '-' )) {
+                        document.getElementById(run.id).style.backgroundColor = 'green';
+                    }
+                    else {
+                        console.log("Die Bedingungen sind erfüllt:");
+                        console.log("run[1]:", run[1].innerHTML);
+                        console.log("runOrg.domain:", runOrg.domain);
+                        console.log("run[6]:", run[6].innerHTML);
+                        console.log("runOrg.arrayOfFights.length:", runOrg.arrayOfFights.length);
+                        document.getElementById(run.id).style.backgroundColor = 'red';
+                    }
+                }
+                else {
+                    document.getElementById(run.id).style.backgroundColor = 'yellow';
+                }
+
+                //console.log(run);
+                //test if run are equal
+            }
+
+
+
+        }
     });
 }
 
