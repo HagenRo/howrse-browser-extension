@@ -41,7 +41,7 @@ function filterUIRuns() {
     });
 
 
-    filteredUIRuns = g_UIRuns.filter((uIRun) => {
+    let filteredUIRuns = g_UIRuns.filter((uIRun) => {
         return uIRunFilters.every(filter => {
             switch (filter.filterType) {
                 case "":
@@ -353,7 +353,7 @@ function buildArrayOfUIRuns(runs) {
 
         let boss = {}
         boss.className = 'js-openRun';
-        let bossDone = run.arrayOfRewards[run.arrayOfRewards.length - 1]?.room == 'boss' && !run.arrayOfRewards[run.arrayOfRewards.length - 1]?.lostRun;
+        let bossDone = run.arrayOfRewards[run.arrayOfRewards.length - 1]?.room == 'boss' && !run.arrayOfRewards[run.arrayOfRewards.length - 1]?.lostRun && !isNaN(parseInt(run.arrayOfRewards[run.arrayOfRewards.length - 1].fragments));
         boss.innerHTML = bossDone ? "Ja" : "Nein";
         boss.id = bossDone ? 1 : 0;
         boss.sortCriteria = bossDone ? "Ja" : "Nein";//TODO: schauen wie - einträge zu behandeln sind
@@ -465,59 +465,99 @@ function addSeasonToDB(startDateOfSeason) {
 //---------------------------------------------------------------------------------------
 // temp code for new version 
 
-function sortByDate(a, b) {
-    if (new Date(a.dateRunStarted) > new Date(b.dateRunStarted)) {
-        return -1;
-    } else if (new Date(a.dateRunStarted) < new Date(b.dateRunStarted)) {
-        return 1;
-    }
-    // a must be equal to b
-    return 0;
-}
+// function sortByDate(a, b) {
+//     if (new Date(a.dateRunStarted) > new Date(b.dateRunStarted)) {
+//         return -1;
+//     } else if (new Date(a.dateRunStarted) < new Date(b.dateRunStarted)) {
+//         return 1;
+//     }
+//     a must be equal to b
+//     return 0;
+// }
 
-let arrayOfRunsOrgVersion;
-function compareVersions() {
-    chrome.storage.local.get(["arrayOfRuns"], function (keyValuePairs) {
-        console.log(keyValuePairs)
-        if (keyValuePairs.arrayOfRuns) {//if array exists
-            arrayOfRunsOrgVersion = keyValuePairs.arrayOfRuns;
-            console.log(arrayOfRunsOrgVersion);
+// let arrayOfRunsOrgVersion;
+// function compareVersions() {
+//     chrome.storage.local.get(["arrayOfRuns"], function (keyValuePairs) {
+//         console.log(keyValuePairs)
+//         if (keyValuePairs.arrayOfRuns) {//if array exists
+//             arrayOfRunsOrgVersion = keyValuePairs.arrayOfRuns;
+//             console.log(arrayOfRunsOrgVersion);
 
-            arrayOfRunsOrgVersion.sort(sortByDate);
-            g_UIRuns.sort(sortUIRunsDesc);
+//             arrayOfRunsOrgVersion.sort(sortByDate);
+//             g_UIRuns.sort(sortUIRunsDesc);
 
-            let orgIndex = 0;
-            for (let index = 0; index < g_UIRuns.length; index++) {
-                let run = g_UIRuns[index];
-                let runOrg = arrayOfRunsOrgVersion[orgIndex];
-                while (new Date(run.id) < new Date(runOrg.dateRunStarted)) {
-                    orgIndex++;
-                    runOrg = arrayOfRunsOrgVersion[orgIndex];
-                }
-                if (run.id == runOrg.dateRunStarted) {
-                    if (run[1].innerHTML == runOrg.domain && (run[6].innerHTML == runOrg.arrayOfFights.length-1 || run[6].innerHTML == runOrg.arrayOfFights.length && run[5].innerHTML == 'Ja' || runOrg.arrayOfFights.length == 0 && run[6].innerHTML == '-' )) {
-                        document.getElementById(run.id).style.backgroundColor = 'green';
-                    }
-                    else {
-                        console.log("Die Bedingungen sind erfüllt:");
-                        console.log("run[1]:", run[1].innerHTML);
-                        console.log("runOrg.domain:", runOrg.domain);
-                        console.log("run[6]:", run[6].innerHTML);
-                        console.log("runOrg.arrayOfFights.length:", runOrg.arrayOfFights.length);
-                        document.getElementById(run.id).style.backgroundColor = 'red';
-                    }
-                }
-                else {
-                    document.getElementById(run.id).style.backgroundColor = 'yellow';
-                }
+//             let orgIndex = 0;
+//             for (let index = 0; index < g_UIRuns.length; index++) {
+//                 let run = g_UIRuns[index];
+//                 let runOrg = arrayOfRunsOrgVersion[orgIndex];
+//                 while (new Date(run.id) < new Date(runOrg.dateRunStarted)) {
+//                     orgIndex++;
+//                     runOrg = arrayOfRunsOrgVersion[orgIndex];
+//                 }
+//                 if (run.id == runOrg.dateRunStarted) {
+//                     if (run[1].innerHTML == runOrg.domain && (run[6].innerHTML == runOrg.arrayOfFights.length - 1 || run[6].innerHTML == runOrg.arrayOfFights.length && run[5].innerHTML == 'Ja' || runOrg.arrayOfFights.length == 0 && run[6].innerHTML == '-')) {
+//                         document.getElementById(run.id).style.backgroundColor = 'green';
+//                     }
+//                     else {
+//                         console.log("Die Bedingungen sind erfüllt:");
+//                         console.log("run[1]:", run[1].innerHTML);
+//                         console.log("runOrg.domain:", runOrg.domain);
+//                         console.log("run[6]:", run[6].innerHTML);
+//                         console.log("runOrg.arrayOfFights.length:", runOrg.arrayOfFights.length);
+//                         document.getElementById(run.id).style.backgroundColor = 'red';
+//                     }
+//                 }
+//                 else {
+//                     document.getElementById(run.id).style.backgroundColor = 'yellow';
+//                 }
 
-                //console.log(run);
-                //test if run are equal
-            }
+//                 console.log(run);
+//                 test if run are equal
+//             }
 
 
 
-        }
-    });
-}
+//         }
+//     });
+// }
 
+
+// function deleteShownRunsFromDB() {
+
+//     for (let index = 0; index < filteredUIRuns.length; index++) {
+//         const run = filteredUIRuns[index];
+//         if (run.isVisible) {
+//             chrome.runtime.sendMessage({ mdText: "deleteRunFromTimestamp", dateRunStarted: run.id }, ({ msg, result }) => {
+//                 console.log('deleteRunFromTimestamp:', msg);
+//             });
+//         }
+
+//     }
+
+// }
+
+// function portRuns() {
+//     chrome.storage.local.get('arrayOfRuns', function (data) {
+//         let ArrayOfOlympRunLoggings = data.arrayOfRuns;
+
+//         chrome.runtime.sendMessage({ mdText: "getKeys" }, ({ msg, result }) => {
+//             if (msg === 'success') {
+//                 console.log('getKeys:', msg, result);
+    
+//                 ArrayOfOlympRunLoggings.forEach(olympRun => {
+//                     if (!(olympRun.dateRunStarted in result)) {
+//                         chrome.runtime.sendMessage({ mdText: "addRunToDB", olympRun: olympRun }, ({ msg, result }) => {
+//                             console.log("addRunToDB:", msg, olympRun);
+//                         });
+//                     }
+//                 });
+    
+//             } else {
+//                 console.log('getKeys:', msg);
+//             }
+    
+    
+//         });
+//         console.info()
+//     });
+// }
