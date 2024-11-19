@@ -169,6 +169,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 sendResponse({msg: e});
             });
             break;
+        case "getSeasonFromStartDate":
+            dataAccessForSeasons.getSeasonFromStartDate(message.startDate)
+            .then(({msg, result})=>{
+                sendResponse({msg: msg, result: result});
+            })
+            .catch((e)=>{
+                sendResponse({msg: e});
+            });
+            break;
             
               
             

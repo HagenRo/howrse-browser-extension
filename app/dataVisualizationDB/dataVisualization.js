@@ -206,7 +206,25 @@ header.forEach(function (th, i) {
         sortUIRuns(i);
     });
 });
-function loadRuns() {
+function loadRuns() {//TODO add chrome.local.storage for the active season key and load seansons depending on this
+
+    chrome.storage.local.get(["activeSeason"], function (keyValuePairs) {
+        chrome.runtime.sendMessage({ mdText: "getSeasonFromStartDate", startDate: keyValuePairs.activeSeason }, ({ msg, result }) => {
+            chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
+                if (msg === 'success') {
+                    globalArrayOfRuns = result;
+                    g_UIRuns = buildArrayOfUIRuns(result);
+                    g_UIRuns.sort(sortUIRunsDesc);
+                    buildTableForUIRuns(g_UIRuns);
+                    calculateAverage();
+                } else {
+                    console.log(msg);
+                }
+        
+            });
+    
+        });
+    });
     chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
         if (msg === 'success') {
             globalArrayOfRuns = result;
@@ -444,12 +462,29 @@ function exportRuns() {
     });
 }
 
-function addSeasonToDB(startDateOfSeason) {
-    let date = new Date(startDateOfSeason);
+function addSeasonToDB(startDateOfSeason, endDateOfSeason, seasonName) {//TODO add chrome.local.storage for the active season key and load seansons depending on this
+    let startDate = new Date(startDateOfSeason);
+    let endDate = new Date(endDateOfSeason);
+
+
     let season = {
-        seasonStartDate: date.getTime(),
-        seasonStartDateHumanReadable: date.toString()
+        startDate: startDate.getTime(),
+        startDateHumanReadable: startDate.toLocaleString( 'de-DE', {hour12: false, day: '2-digit',month: '2-digit',year: 'numeric',hour: '2-digit',minute: '2-digit'}).replace(',', ''),
+        endDate: endDate.getTime(),
+        endDateHumanReadable: endDate.toLocaleString( 'de-DE', {hour12: false, day: '2-digit',month: '2-digit',year: 'numeric',hour: '2-digit',minute: '2-digit'}).replace(',', ''),
+        name: seasonName
+
     };
+    
+    chrome.storage.local.get(["activeSeason"], function (keyValuePairs) {
+        console.log(keyValuePairs.activeSeason);
+        if (keyValuePairs.activeSeason && keyValuePairs.activeSeason<startDate){
+            chrome.storage.local.set({ "activeSeason": startDate }, function () {
+                console.log('updated active Season flag', startDate, season.startDateHumanReadable);
+            });
+        }
+    });
+
     chrome.runtime.sendMessage({ mdText: "addSeasonToDB", season: season }, ({ msg, result }) => {
         if (msg === 'success') {
             console.log(msg, result);

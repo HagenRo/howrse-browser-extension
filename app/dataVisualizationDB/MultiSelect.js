@@ -208,12 +208,17 @@ class MultiSelectSeasonsFromDB {
                     console.log('loadedSeasons: ', result);
                     result.forEach(season => {
                         this.options.data.push({
-                            value: season.seasonStartDate,
-                            text: season.seasonStartDateHumanReadable,
+                            value: season,
+                            text: season.name + ' ' + season.startDateHumanReadable + ' bis ' + season.endDateHumanReadable,
                             selected: false,
                             html: null
                         });
                     });
+                    this.options.data.sort((a,b)=>b.value.startDate-a.value.startDate);
+                    if (this.options.data?.[0]) {
+                        this.options.data[0].selected = true;
+                    }
+                    
                     resolve(); // Auflösung des Promises nach erfolgreichem Laden
                 } else {
                     console.log(msg);

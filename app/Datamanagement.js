@@ -24,7 +24,7 @@ class DatabaseConnection {
 
             console.log('indexedDB.open(this.dbName, 1);', this.dbName)
 
-            const request = indexedDB.open(this.dbName, 2);
+            const request = indexedDB.open(this.dbName, 3);
 
             request.onupgradeneeded = (event) => {
                 const db = event.target.result;
@@ -59,20 +59,20 @@ class DatabaseConnection {
             const request = store.add(item);
 
             request.onsuccess = () => {
-                resolve({msg: 'success'});
+                resolve({ msg: 'success', result: item });
             };
 
             request.onerror = (event) => {
                 console.log(event);
-                reject({msg: event.target.errorCode});
+                reject({ msg: event.target.errorCode });
             };
         });
     }
-/**
-     * Inserts or updates an item in the object store.
-     * @param {Object} item - The item to insert or update.
-     * @returns {Promise<Object>} - A promise that resolves with a success message or rejects with an error message.
-     */
+    /**
+         * Inserts or updates an item in the object store.
+         * @param {Object} item - The item to insert or update.
+         * @returns {Promise<Object>} - A promise that resolves with a success message or rejects with an error message.
+         */
     async insertOrOverrideItem(item) {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction(this.storeName, 'readwrite');
@@ -80,12 +80,12 @@ class DatabaseConnection {
             const request = store.put(item);
 
             request.onsuccess = () => {
-                resolve({msg: 'success'});
+                resolve({ msg: 'success' });
             };
 
             request.onerror = (event) => {
                 console.log(event);
-                reject({msg: event.target.errorCode});
+                reject({ msg: event.target.errorCode });
             };
         });
     }
@@ -101,12 +101,12 @@ class DatabaseConnection {
             const request = store.get(id);
 
             request.onsuccess = (event) => {
-                resolve({msg: 'success', result: event.target.result});
+                resolve({ msg: 'success', result: event.target.result });
             };
 
             request.onerror = (event) => {
                 console.log(event);
-                reject({msg: event.target.errorCode});
+                reject({ msg: event.target.errorCode });
             };
         });
     }
@@ -122,12 +122,12 @@ class DatabaseConnection {
             const request = store.delete(id);
 
             request.onsuccess = () => {
-                resolve({msg: 'success'});
+                resolve({ msg: 'success' });
             };
 
             request.onerror = (event) => {
                 console.log(event);
-                reject({msg: event.target.errorCode});
+                reject({ msg: event.target.errorCode });
             };
         });
     }
@@ -158,12 +158,12 @@ class DatabaseConnection {
             const request = store.getAllKeys();  // Alle Schlüssel abrufen
 
             request.onsuccess = (event) => {
-                resolve({msg: 'success', result: event.target.result});
+                resolve({ msg: 'success', result: event.target.result });
             };
 
             request.onerror = (event) => {
                 console.log(event);
-                reject({msg: event.target.errorCode});
+                reject({ msg: event.target.errorCode });
             };
         });
     }
@@ -179,15 +179,39 @@ class DatabaseConnection {
             const request = store.getAll();  // Fetch all items
 
             request.onsuccess = (event) => {
-                resolve({msg: 'success', result: event.target.result});
+                resolve({ msg: 'success', result: event.target.result });
             };
 
             request.onerror = (event) => {
                 console.log(event);
-                reject({msg: event.target.errorCode});
+                reject({ msg: event.target.errorCode });
             };
         });
 
+    }
+    /**
+     * Retrieves all items from the object store.
+     * @param {} minKey - The min key of the runs to fetch.
+     * @param {} maxKey - The max key of the runs to fetch.
+     * @returns {Promise<Object>} - A promise that resolves with an array of items or an error message.
+     */
+    async getItemsInRange(minKey, maxKey) {
+        return new Promise((resolve, reject) => {
+            const transaction = this.db.transaction(this.storeName, 'readonly');
+            const store = transaction.objectStore(this.storeName);
+            const keyRange = IDBKeyRange.bound(minKey, maxKey);
+
+            const request = store.getAll(keyRange);
+
+            request.onsuccess = (event) => {
+                resolve({ msg: 'success', result: event.target.result });
+            };
+
+            request.onerror = (event) => {
+                console.log(event);
+                reject({ msg: event.target.errorCode });
+            };
+        });
     }
     // async getItemsInKeyRange(keyRange) {
     //     return new Promise((resolve, reject) => {
@@ -241,7 +265,7 @@ class DatabaseConnection {
 /**
  * A simple queue implementation for executing promises sequentially.
  */
-class Queue {    
+class Queue {
     /**
     * The array that holds the queued promises.
     * @type {Array<{promise: function, resolve: function, reject: function}>}
@@ -359,7 +383,7 @@ class DataAccessForOlympRuns {
 
         return this.promisQueue.enqueue(() => {
             return this.databaseConnection.getItem(dateRunStarted)
-                .then(({msg, result}) => {
+                .then(({ msg, result }) => {
                     result.startHorses = startHorsesFull;
                     return this.databaseConnection.insertOrOverrideItem(result);
                 })
@@ -376,15 +400,15 @@ class DataAccessForOlympRuns {
 
         return this.promisQueue.enqueue(() => {
             return this.databaseConnection.getItem(dateRunStarted)
-                .then(({msg, result}) => {
-                    if (result.arrayOfFights.length == 0 || !(result.arrayOfFights[result.arrayOfFights.length-1].room === fight.room && result.arrayOfFights[result.arrayOfFights.length-1].threshold === fight.threshold) ) {
+                .then(({ msg, result }) => {
+                    if (result.arrayOfFights.length == 0 || !(result.arrayOfFights[result.arrayOfFights.length - 1].room === fight.room && result.arrayOfFights[result.arrayOfFights.length - 1].threshold === fight.threshold)) {
                         result.arrayOfFights.push(fight);
                         return this.databaseConnection.insertOrOverrideItem(result);
                     }
-                    else{
+                    else {
                         return Promise.reject("figth already in database.");
                     }
-                    
+
                 })
         });
 
@@ -399,12 +423,12 @@ class DataAccessForOlympRuns {
 
         return this.promisQueue.enqueue(() => {
             return this.databaseConnection.getItem(dateRunStarted)
-                .then(({msg, result}) => {
-                    if (result.arrayOfRewards.length == 0 || !(result.arrayOfRewards[result.arrayOfRewards.length-1].room === rewards.room && result.arrayOfRewards[result.arrayOfRewards.length-1].threshold === rewards.threshold)) {
+                .then(({ msg, result }) => {
+                    if (result.arrayOfRewards.length == 0 || !(result.arrayOfRewards[result.arrayOfRewards.length - 1].room === rewards.room && result.arrayOfRewards[result.arrayOfRewards.length - 1].threshold === rewards.threshold)) {
                         result.arrayOfRewards.push(rewards);
                         return this.databaseConnection.insertOrOverrideItem(result);
                     }
-                    else{
+                    else {
                         return Promise.reject("rewards already in database.");
                     }
                 })
@@ -420,7 +444,7 @@ class DataAccessForOlympRuns {
 
         return this.promisQueue.enqueue(() => {
             return this.databaseConnection.getItem(dateRunStarted)
-                .then(({msg, result}) => {
+                .then(({ msg, result }) => {
                     let lastRewards = result.arrayOfRewards[result.arrayOfRewards.length - 1].arrayOfRewards;
                     for (let i = 0; i < lastRewards.length; i++) {
                         const element = lastRewards[i];
@@ -444,16 +468,16 @@ class DataAccessForOlympRuns {
 
         return this.promisQueue.enqueue(() => {
             return this.databaseConnection.getItem(dateRunStarted)
-                .then(({msg, result}) => {
-                        if (!(result.arrayOfRewards[result.arrayOfRewards.length-1].room === rewards.room && result.arrayOfRewards[result.arrayOfRewards.length-1].threshold === rewards.threshold)) {
-                            result.arrayOfRewards.push(rewards);                    
-                            result.arrayOfFights.push(fight);
+                .then(({ msg, result }) => {
+                    if (!(result.arrayOfRewards[result.arrayOfRewards.length - 1].room === rewards.room && result.arrayOfRewards[result.arrayOfRewards.length - 1].threshold === rewards.threshold)) {
+                        result.arrayOfRewards.push(rewards);
+                        result.arrayOfFights.push(fight);
 
-                            return this.databaseConnection.insertOrOverrideItem(result);
-                        }
-                        else{
-                            return Promise.reject("boss already in database.");
-                        }
+                        return this.databaseConnection.insertOrOverrideItem(result);
+                    }
+                    else {
+                        return Promise.reject("boss already in database.");
+                    }
                 })
         });
 
@@ -467,7 +491,7 @@ class DataAccessForOlympRuns {
 
         return this.promisQueue.enqueue(() => {
             return this.databaseConnection.getItem(dateRunStarted)
-                .then(({msg, result}) => {
+                .then(({ msg, result }) => {
                     let lastRewards = result.arrayOfRewards[result.arrayOfRewards.length - 1];
                     if (lastRewards.room == 'boss') {
                         lastRewards.lostRun = true;
@@ -487,11 +511,23 @@ class DataAccessForOlympRuns {
 
     }
     /**
+     * Fetches all runs from the database.
+     * @param {Int} dateTimeMin - The min timestamp of the runs to fetch.
+     * @param {Int} dateTimeMax - The max timestamp of the runs to fetch.
+     * @returns {Promise} A Promise that resolves with an array of all runs.
+     */
+    getRunsInRange(dateTimeMin, dateTimeMax) {//TODO: damit das funktionieren kann datenbank key umbauen
+        return this.promisQueue.enqueue(() => {
+            return this.databaseConnection.getItemsInRange(dateTimeMin, dateTimeMax);
+        });
+
+    }
+    /**
      * Fetches a specific run from the database based on the timestamp.
      * @param {string} dateRunStarted - The timestamp of the run to fetch.
      * @returns {Promise} A Promise that resolves with the requested run data.
      */
-    getRunFromTimestamp(dateRunStarted){
+    getRunFromTimestamp(dateRunStarted) {
         return this.promisQueue.enqueue(() => {
             return this.databaseConnection.getItem(dateRunStarted);
         });
@@ -501,7 +537,7 @@ class DataAccessForOlympRuns {
      * @param {string} dateRunStarted - The timestamp of the run to delete.
      * @returns {Promise} A Promise that resolves when the run is deleted.
      */
-    deleteRunFromTimestamp(dateRunStarted){
+    deleteRunFromTimestamp(dateRunStarted) {
         return this.promisQueue.enqueue(() => {
             return this.databaseConnection.deleteItem(dateRunStarted);
         });
@@ -510,7 +546,7 @@ class DataAccessForOlympRuns {
      * Retrieves all keys from the database.
      * @returns {Promise} A Promise that resolves with an array of all keys.
      */
-    getKeys(){
+    getKeys() {
         return this.promisQueue.enqueue(() => {
             return this.databaseConnection.getAllKeys();
         });
@@ -526,7 +562,7 @@ class DataAccessForSeasons {
      * Initializes the database connection and sets up the promise queue.
      */
     constructor() {
-        this.databaseConnection = new DatabaseConnection('OlympSeasons', 'Seasons', 'seasonStartDate');
+        this.databaseConnection = new DatabaseConnection('OlympSeasons', 'Seasons', 'startDate');
         this.promisQueue = Queue;
         console.log('DataAccessForSeasons: constructor')
         this.initDataAccessForSeasons();
@@ -568,12 +604,12 @@ class DataAccessForSeasons {
     /**
      * Retrieves a season based on its start date.
      * 
-     * @param {Date} dateRunStarted - The start date of the season to be retrieved.
+     * @param {Int} startDate - The start date of the season, in numerical, to be retrieved.
      * @returns {Promise<Object>} - A promise that resolves with the season data or rejects if there is an error.
      */
-    getSeasonFromStartDate(dateRunStarted){
+    getSeasonFromStartDate(startDate) {
         return this.promisQueue.enqueue(() => {
-            return this.databaseConnection.getItem(dateRunStarted);
+            return this.databaseConnection.getItem(startDate);
         });
     }
     /**
@@ -581,7 +617,7 @@ class DataAccessForSeasons {
      * 
      * @returns {Promise<Array>} - A promise that resolves with an array of keys.
      */
-    getKeys(){
+    getKeys() {
         return this.promisQueue.enqueue(() => {
             return this.databaseConnection.getAllKeys();
         });
