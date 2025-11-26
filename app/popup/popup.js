@@ -22,7 +22,7 @@ myButton2.addEventListener("click", () => {
 const myButton3 = document.getElementById("runbtn");
 
 myButton3.addEventListener("click", () => {
-    chrome.tabs.create({ url: 'app/dataVisualization/dataVisualization.html', active: true });
+    chrome.tabs.create({ url: 'app/dataVisualizationDB/dataVisualization.html', active: true });
     //overrideLog();
     //printLogging();
 

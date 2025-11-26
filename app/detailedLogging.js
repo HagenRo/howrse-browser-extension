@@ -397,7 +397,6 @@ function updateHorseIdToLog(id) {
 @param {RewardsForLog} rewardsForLog - The rewards to be added to the log.
 @param {object} fight - The fight object to be added.
 @param {number} dateRunStarted - The timestamp of the run when it started. */
-
 function addBossToLog(rewardsForLog, fight, dateRunStarted) {
     chrome.storage.local.get(["arrayOfRuns"], function (keyValuePairs) {
         if (keyValuePairs.arrayOfRuns) {//if array exists

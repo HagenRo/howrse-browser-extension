@@ -212,6 +212,7 @@ function loadRuns() {//TODO add chrome.local.storage for the active season key a
         chrome.runtime.sendMessage({ mdText: "getSeasonFromStartDate", startDate: keyValuePairs.activeSeason }, ({ msg, result }) => {
             chrome.runtime.sendMessage({ mdText: "getAllRunsFromDB" }, ({ msg, result }) => {
                 if (msg === 'success') {
+                    console.log(msg);
                     globalArrayOfRuns = result;
                     g_UIRuns = buildArrayOfUIRuns(result);
                     g_UIRuns.sort(sortUIRunsDesc);
