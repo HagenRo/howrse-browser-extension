@@ -223,11 +223,59 @@ $("body")[0].addEventListener('click', function (event) {
         }
     }
 
-}, true)
+}, true);
+
+/*Checks for cutting high level card (fight).
+- The Horse is devine or precious
+- The Horse has at least 1 level
+- The user has not previously selected the option to cut the card.
+ */
+// $(document).on('click', '.rowguecard.rowguecard--precious[data-currentlevel]:not([data-currentlevel="1"]),.rowguecard.rowguecard--devine[data-currentlevel]:not([data-currentlevel="1"])', (event)=>{
+//     if ($('.js-rowgue-bonus-type-newCard.block.js-block--selected')[0]) {
+//         console.log('hi');
+//         let cutCard = ('true' === window.localStorage.getItem('cutCard'));
+//         if (!cutCard) {
+//             let ja = confirm('Willst du wirklich weniger anwählen als du könntest?');
+//             event.preventDefault();
+//             event.stopPropagation();
+//             event.stopImmediatePropagation();
+//             if (ja) {
+//                 window.localStorage.setItem('cutCard', 'true');
+//             } else {
+
+//             }
+//         }
+        
+//     }
+// });
+$("body")[0].addEventListener('click', function (event) {
+    let rewardIsNewCard = $('.js-rowgue-bonus-type-newCard.block.js-block--selected')?.[0]?true:false;
+    console.log(event.target)
+    let selectedHorseIsToGood = $(event.target).is('.rowguecard.rowguecard--precious[data-currentlevel]:not([data-currentlevel="1"]),.rowguecard.rowguecard--devine[data-currentlevel]:not([data-currentlevel="1"])');
+    console.log(selectedHorseIsToGood)
+
+    if (rewardIsNewCard && selectedHorseIsToGood) {
+        let cutCard = ('true' === window.localStorage.getItem('cutCard'));
+        if (!cutCard) {
+            let yes = confirm('Willst du wirklich dieses Pferd entfernen?');
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            if (yes) {
+                window.localStorage.setItem('cutCard', 'true');
+            } else {
+
+            }
+        }
+    }
+
+}, true);
+
 
 //reset the too few selected cards variable.
 $(document).on('click', '.rgproba__btn.btn--primary.btn', function () {
     window.localStorage.setItem('selectLessTry', 'false');
+    window.localStorage.setItem('cutCard', 'false');
 })
 
 //checks if drachma and sets "wasSetThisRunStartHorses"='false'
