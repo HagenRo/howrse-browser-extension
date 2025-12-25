@@ -225,29 +225,7 @@ $("body")[0].addEventListener('click', function (event) {
 
 }, true);
 
-/*Checks for cutting high level card (fight).
-- The Horse is devine or precious
-- The Horse has at least 1 level
-- The user has not previously selected the option to cut the card.
- */
-// $(document).on('click', '.rowguecard.rowguecard--precious[data-currentlevel]:not([data-currentlevel="1"]),.rowguecard.rowguecard--devine[data-currentlevel]:not([data-currentlevel="1"])', (event)=>{
-//     if ($('.js-rowgue-bonus-type-newCard.block.js-block--selected')[0]) {
-//         console.log('hi');
-//         let cutCard = ('true' === window.localStorage.getItem('cutCard'));
-//         if (!cutCard) {
-//             let ja = confirm('Willst du wirklich weniger anwählen als du könntest?');
-//             event.preventDefault();
-//             event.stopPropagation();
-//             event.stopImmediatePropagation();
-//             if (ja) {
-//                 window.localStorage.setItem('cutCard', 'true');
-//             } else {
 
-//             }
-//         }
-        
-//     }
-// });
 $("body")[0].addEventListener('click', function (event) {
     let rewardIsNewCard = $('.js-rowgue-bonus-type-newCard.block.js-block--selected')?.[0]?true:false;
     console.log(event.target)
